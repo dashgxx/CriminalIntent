@@ -48,4 +48,13 @@ public class Crime {
     public void setSolved(boolean solved) {
         mSolved = solved;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        //return super.equals(obj);
+        if (!(obj instanceof Crime))
+            return false;
+        Crime crime=(Crime)obj;
+        return mId.equals(crime.getId());
+    }
 }
