@@ -1,12 +1,10 @@
 package com.example.xx.criminalintent;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -43,8 +41,10 @@ public class CrimeListFragment extends Fragment {
             //Toast.makeText(getActivity(),mCrime.getTitle()+" clicked!",Toast.LENGTH_SHORT).show();
 
             UUID uuid=mCrime.getId();
-            Intent intent=CrimeActivity.newIntent(getActivity(),uuid);
-            startActivityForResult(intent,REQUEST_CRIME);
+            //Intent intent=CrimeActivity.newIntent(getActivity(),uuid);
+            //startActivityForResult(intent,REQUEST_CRIME);
+            Intent intent=CrimePagerActivity.newIntent(getActivity(),uuid);
+            startActivity(intent);
         }
 
         public CrimeHolder(View itemView) {
@@ -124,7 +124,7 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //updateUI();
+        updateUI();
     }
 
     private void updateUI()
