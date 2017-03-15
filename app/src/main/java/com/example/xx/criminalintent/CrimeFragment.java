@@ -12,6 +12,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -55,6 +58,8 @@ public class CrimeFragment extends Fragment {
         UUID uuid=(UUID) getArguments().getSerializable(ARG_CRIME_ID);
 
         mCrime=CrimeLab.get(getActivity()).getCrime(uuid);
+
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -119,6 +124,27 @@ public class CrimeFragment extends Fragment {
                 mCrime.setDate(date);
                 updateDate();
             }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.fragment_crime,menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.menu_item_delete_crime:
+                CrimeLab.get(getActivity()).getCrimes().remove(mCrime);
+                getActivity().finish();
+             default:
+                 return super.onOptionsItemSelected(item);
+        }
+
     }
 
     private void updateDate() {

@@ -1,7 +1,6 @@
 package com.example.xx.criminalintent;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,9 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +31,10 @@ public class CrimeListFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+
+    private LinearLayout mLinearLayout;
+    private Button mNewCrimeButton;
+
     private boolean mSubtitleVisible=false;
 
     private static final int REQUEST_CRIME=1;
@@ -50,7 +54,7 @@ public class CrimeListFragment extends Fragment {
             UUID uuid=mCrime.getId();
             //Intent intent=CrimeActivity.newIntent(getActivity(),uuid);
             //startActivityForResult(intent,REQUEST_CRIME);
-            createCrimePagerFragment(uuid);
+            createCrimePagerActivity(uuid);
         }
 
         public CrimeHolder(View itemView) {
@@ -129,6 +133,16 @@ public class CrimeListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_crime_list,container,false);
 
+        mLinearLayout=(LinearLayout)view.findViewById(R.id.blank_crime_list);
+
+        mNewCrimeButton=(Button)view.findViewById(R.id.button_new_crime);
+        mNewCrimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createNewCrime();
+            }
+        });
+
         mCrimeRecyclerView=(RecyclerView)view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -173,9 +187,7 @@ public class CrimeListFragment extends Fragment {
         switch (item.getItemId())
         {
             case R.id.menu_item_new_crime:
-                Crime crime=new Crime();
-                CrimeLab.get(getActivity()).addCrime(crime);
-                createCrimePagerFragment(crime.getId());
+                createNewCrime();
                 return true;
             case R.id.menu_item_show_subtitle:
                 mSubtitleVisible=!mSubtitleVisible;
@@ -195,6 +207,18 @@ public class CrimeListFragment extends Fragment {
 
     private void updateUI()
     {
+        int count=CrimeLab.get(getActivity()).getCrimes().size();
+        if (count==0)
+        {
+            mLinearLayout.setVisibility(View.VISIBLE);
+            mCrimeRecyclerView.setVisibility(View.INVISIBLE);
+        }
+        else
+        {
+            mLinearLayout.setVisibility(View.INVISIBLE);
+            mCrimeRecyclerView.setVisibility(View.VISIBLE);
+        }
+
         if(mAdapter==null)
         {
             mAdapter=new CrimeAdapter(CrimeLab.get(getActivity()).getCrimes());
@@ -212,17 +236,25 @@ public class CrimeListFragment extends Fragment {
         if(mSubtitleVisible)
         {
             int count=CrimeLab.get(getActivity()).getCrimes().size();
-            subtitle=getString(R.string.subtitle_format,""+count);
+            subtitle=getResources().getQuantityString(R.plurals.subtitle_format,count,count);
         }
 
         AppCompatActivity activity=(AppCompatActivity)getActivity();
         activity.getSupportActionBar().setSubtitle(subtitle);
     }
     
-    private void createCrimePagerFragment(UUID uuid) {
+    private void createCrimePagerActivity(UUID uuid) {
         Intent intent= CrimePagerActivity.newIntent(getActivity(),uuid);
         intent.putExtra(SAVED_SUBTITLE_VISIBLE,mSubtitleVisible);
         startActivity(intent);
     }
+
+
+    private void createNewCrime() {
+        Crime crime=new Crime();
+        CrimeLab.get(getActivity()).addCrime(crime);
+        createCrimePagerActivity(crime.getId());
+    }
+
 
 }
