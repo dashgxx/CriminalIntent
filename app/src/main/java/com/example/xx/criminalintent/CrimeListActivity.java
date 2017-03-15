@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 public class CrimeListActivity extends SingleFragentActivity {
     @Override
     protected Fragment createFragment() {
-        return new CrimeListFragment();
+        boolean visible=getIntent().getBooleanExtra(CrimeListFragment.SAVED_SUBTITLE_VISIBLE,false);
+        return CrimeListFragment.newInstance(visible);
     }
 }

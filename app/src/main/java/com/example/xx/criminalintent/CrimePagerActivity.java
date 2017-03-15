@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 
 import java.net.ConnectException;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.UUID;
  * Created by XX on 2017/3/12.
  */
 
-public class CrimePagerActivity extends FragmentActivity {
+public class CrimePagerActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
 
@@ -62,6 +63,14 @@ public class CrimePagerActivity extends FragmentActivity {
                 break;
             }
         }
+    }
 
+    @Nullable
+    @Override
+    public Intent getSupportParentActivityIntent() {
+        boolean visible=getIntent().getBooleanExtra(CrimeListFragment.SAVED_SUBTITLE_VISIBLE,false);
+        Intent intent=new Intent(this,CrimeListActivity.class);
+        intent.putExtra(CrimeListFragment.SAVED_SUBTITLE_VISIBLE,visible);
+        return intent;
     }
 }

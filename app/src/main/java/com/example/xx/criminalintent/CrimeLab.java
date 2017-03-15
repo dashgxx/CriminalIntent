@@ -3,6 +3,7 @@ package com.example.xx.criminalintent;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +28,11 @@ public class CrimeLab {
         return mCrimes;
     }
 
+    public void addCrime(Crime crime)
+    {
+        mCrimes.add(crime);
+    }
+
     public Crime getCrime(UUID id)
     {
         for (Crime crime:mCrimes) {
@@ -39,12 +45,12 @@ public class CrimeLab {
     private CrimeLab(Context context)
     {
         mCrimes=new ArrayList<>();
-        for(int i=0;i<100;i++)
+/*        for(int i=0;i<100;i++)
         {
             Crime crime=new Crime();
             crime.setTitle("crime #"+i);
             crime.setSolved(i%2==0);
             mCrimes.add(crime);
-        }
+        }*/
     }
 }

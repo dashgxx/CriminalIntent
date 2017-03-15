@@ -1,14 +1,19 @@
 package com.example.xx.criminalintent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -26,9 +31,11 @@ public class CrimeListFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private boolean mSubtitleVisible=false;
 
     private static final int REQUEST_CRIME=1;
     public static final String EXTRA_CHANGED_INDEX="com.example.xx.criminalintent.changed_index";
+    public static final String SAVED_SUBTITLE_VISIBLE="subtitle_visible";
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
@@ -43,8 +50,7 @@ public class CrimeListFragment extends Fragment {
             UUID uuid=mCrime.getId();
             //Intent intent=CrimeActivity.newIntent(getActivity(),uuid);
             //startActivityForResult(intent,REQUEST_CRIME);
-            Intent intent=CrimePagerActivity.newIntent(getActivity(),uuid);
-            startActivity(intent);
+            createCrimePagerFragment(uuid);
         }
 
         public CrimeHolder(View itemView) {
@@ -97,6 +103,29 @@ public class CrimeListFragment extends Fragment {
 
     }
 
+    public static CrimeListFragment newInstance(boolean visible) {
+        
+        Bundle args = new Bundle();
+
+        args.putBoolean(SAVED_SUBTITLE_VISIBLE,visible);
+
+        CrimeListFragment fragment = new CrimeListFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(savedInstanceState!=null)
+            mSubtitleVisible=savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
+        else
+            mSubtitleVisible=getArguments().getBoolean(SAVED_SUBTITLE_VISIBLE);
+
+        setHasOptionsMenu(true);
+    }
+
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_crime_list,container,false);
 
@@ -127,6 +156,43 @@ public class CrimeListFragment extends Fragment {
         updateUI();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime_list,menu);
+
+        MenuItem item=menu.findItem(R.id.menu_item_show_subtitle);
+        if(mSubtitleVisible)
+            item.setTitle(R.string.hide_subtitle);
+        else
+            item.setTitle(R.string.show_subtitle);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.menu_item_new_crime:
+                Crime crime=new Crime();
+                CrimeLab.get(getActivity()).addCrime(crime);
+                createCrimePagerFragment(crime.getId());
+                return true;
+            case R.id.menu_item_show_subtitle:
+                mSubtitleVisible=!mSubtitleVisible;
+                getActivity().invalidateOptionsMenu();
+                updateSubtitle();
+                return  true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE,mSubtitleVisible);
+    }
+
     private void updateUI()
     {
         if(mAdapter==null)
@@ -136,5 +202,27 @@ public class CrimeListFragment extends Fragment {
         }
         else
             mAdapter.notifyDataSetChanged();
+
+        updateSubtitle();
     }
+
+    private void updateSubtitle()
+    {
+        String subtitle=null;
+        if(mSubtitleVisible)
+        {
+            int count=CrimeLab.get(getActivity()).getCrimes().size();
+            subtitle=getString(R.string.subtitle_format,""+count);
+        }
+
+        AppCompatActivity activity=(AppCompatActivity)getActivity();
+        activity.getSupportActionBar().setSubtitle(subtitle);
+    }
+    
+    private void createCrimePagerFragment(UUID uuid) {
+        Intent intent= CrimePagerActivity.newIntent(getActivity(),uuid);
+        intent.putExtra(SAVED_SUBTITLE_VISIBLE,mSubtitleVisible);
+        startActivity(intent);
+    }
+
 }
