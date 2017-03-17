@@ -104,7 +104,10 @@ public class CrimeListFragment extends Fragment {
             holder.bindCrime(crime);
         }
 
-
+        public void setCrimes(List<Crime> crimes)
+        {
+            mCrimes=crimes;
+        }
     }
 
     public static CrimeListFragment newInstance(boolean visible) {
@@ -207,8 +210,8 @@ public class CrimeListFragment extends Fragment {
 
     private void updateUI()
     {
-        int count=CrimeLab.get(getActivity()).getCrimes().size();
-        if (count==0)
+        List<Crime> crimes=CrimeLab.get(getActivity()).getCrimes();
+        if (crimes.size()==0)
         {
             mLinearLayout.setVisibility(View.VISIBLE);
             mCrimeRecyclerView.setVisibility(View.INVISIBLE);
@@ -225,7 +228,10 @@ public class CrimeListFragment extends Fragment {
             mCrimeRecyclerView.setAdapter(mAdapter);
         }
         else
+        {
+            mAdapter.setCrimes(crimes);
             mAdapter.notifyDataSetChanged();
+        }
 
         updateSubtitle();
     }
@@ -255,6 +261,5 @@ public class CrimeListFragment extends Fragment {
         CrimeLab.get(getActivity()).addCrime(crime);
         createCrimePagerActivity(crime.getId());
     }
-
 
 }

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,7 +21,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
-import java.io.BufferedReader;
 import java.util.Date;
 import java.util.UUID;
 
@@ -139,12 +137,19 @@ public class CrimeFragment extends Fragment {
         switch (item.getItemId())
         {
             case R.id.menu_item_delete_crime:
-                CrimeLab.get(getActivity()).getCrimes().remove(mCrime);
+                CrimeLab.get(getActivity()).deleteCrime(mCrime.getId());
                 getActivity().finish();
              default:
                  return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
     }
 
     private void updateDate() {
