@@ -2,9 +2,13 @@ package com.example.xx.criminalintent;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
+import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -81,6 +85,16 @@ public class CrimeLab {
         }finally {
             cursorWrapper.close();
         }
+    }
+
+    public File getPhotoFile(Crime crime)
+    {
+        File dir=mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        if(dir==null)
+            return null;
+
+        return new File(dir,crime.getPhotoFilename());
     }
 
     private CrimeLab(Context context)

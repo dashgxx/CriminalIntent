@@ -64,6 +64,11 @@ public class Crime {
         mSuspect = suspect;
     }
 
+    public String getPhotoFilename()
+    {
+        return "IMG_"+getId().toString()+".jpg";
+    }
+
     @Override
     public boolean equals(Object obj) {
         //return super.equals(obj);

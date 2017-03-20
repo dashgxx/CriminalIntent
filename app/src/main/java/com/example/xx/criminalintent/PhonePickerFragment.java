@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
-import android.widget.ListView;
 
 /**
  * Created by XX on 2017/3/19.
@@ -20,7 +18,7 @@ public class PhonePickerFragment extends DialogFragment {
     private static final String ARG_BUTTON_LIST="button_list";
     public static final String EXTRA_PHONE_NUMBER ="phone_number";
 
-    private String[] buttonList;
+    private String[] mButtonList;
 
     public static PhonePickerFragment newInstance(String[] buttonList) {
 
@@ -37,14 +35,14 @@ public class PhonePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        buttonList=(String[]) getArguments().getSerializable(ARG_BUTTON_LIST);
+        mButtonList =(String[]) getArguments().getSerializable(ARG_BUTTON_LIST);
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.phone_picker_title)
-                .setItems(buttonList, new DialogInterface.OnClickListener() {
+                .setItems(mButtonList, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        sendResult(Activity.RESULT_OK,buttonList[i]);
+                        sendResult(Activity.RESULT_OK, mButtonList[i]);
                     }
                 })
                 .create();
