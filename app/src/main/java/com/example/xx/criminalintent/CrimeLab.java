@@ -97,6 +97,7 @@ public class CrimeLab {
         contentValues.put(CrimeTable.Column.TITLE,crime.getTitle());
         contentValues.put(CrimeTable.Column.DATE,crime.getDate().getTime());
         contentValues.put(CrimeTable.Column.SOLVED,crime.isSolved()?1:0);
+        contentValues.put(CrimeTable.Column.SUSPECT,crime.getSuspect());
         return contentValues;
     }
 
