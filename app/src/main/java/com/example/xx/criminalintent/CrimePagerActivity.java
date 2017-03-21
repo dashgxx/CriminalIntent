@@ -20,16 +20,19 @@ import java.util.UUID;
  * Created by XX on 2017/3/12.
  */
 
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity
+    implements CrimeFragment.Callbacks
+{
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
 
     private static final String EXTRA_CRIME_ID="com.example.xx.criminalintent.crime_id";
 
-    public static Intent newIntent(Context context,UUID uuid)
+    public static Intent newIntent(Context context,UUID uuid,boolean visible)
     {
         Intent intent=new Intent(context,CrimePagerActivity.class);
         intent.putExtra(EXTRA_CRIME_ID,uuid);
+        intent.putExtra(CrimeListFragment.SAVED_SUBTITLE_VISIBLE,visible);
         return intent;
     }
 
@@ -72,5 +75,15 @@ public class CrimePagerActivity extends AppCompatActivity {
         Intent intent=new Intent(this,CrimeListActivity.class);
         intent.putExtra(CrimeListFragment.SAVED_SUBTITLE_VISIBLE,visible);
         return intent;
+    }
+
+    @Override
+    public void onCrimeDeleted() {
+        finish();
+    }
+
+    @Override
+    public void onCrimeUpdated(Crime crime) {
+
     }
 }

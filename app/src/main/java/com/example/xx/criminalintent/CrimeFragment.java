@@ -1,12 +1,14 @@
 package com.example.xx.criminalintent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.provider.MediaStore;
@@ -54,7 +56,8 @@ public class CrimeFragment extends Fragment {
 
     private Crime mCrime;
     private File mPhotoFile;
-    private boolean hasModified=false;
+    private Callbacks mCallbacks;
+//    private boolean hasModified=false;
 
     private static final String ARG_CRIME_ID="crime_id";
     private static final String DIALOG_DATE="date";
@@ -64,6 +67,12 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_CONTACT =1;
     private static final int REQUEST_PHONE=2;
     private static final int REQUEST_PHOTO=3;
+
+    public interface Callbacks
+    {
+        void onCrimeUpdated(Crime crime);
+        void onCrimeDeleted();
+    }
 
     public static CrimeFragment newInstance(UUID id) {
 
@@ -107,6 +116,14 @@ public class CrimeFragment extends Fragment {
                 bigPictureFrament.show(fm,DIALOG_BIG_PICTURE);
             }
         });
+        mPhotoView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                boolean ret= mPhotoFile.delete();
+                updatePhoto();
+                return ret;
+            }
+        });
         if(availableCamera){
             mPhotoView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
@@ -142,7 +159,8 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 mCrime.setTitle(charSequence.toString());
-                returnResult();
+                updateCrimeList();
+//                returnResult();
             }
 
             @Override
@@ -170,7 +188,8 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 mCrime.setSolved(b);
-                returnResult();
+                updateCrimeList();
+//                returnResult();
             }
         });
 
@@ -295,6 +314,7 @@ public class CrimeFragment extends Fragment {
                 Date date = (Date) data.getSerializableExtra(DateickerFragment.ARG_DATE);
                 mCrime.setDate(date);
                 updateDate();
+                updateCrimeList();
             }
         }
         else
@@ -349,18 +369,35 @@ public class CrimeFragment extends Fragment {
         {
             case R.id.menu_item_delete_crime:
                 CrimeLab.get(getActivity()).deleteCrime(mCrime.getId());
-                getActivity().finish();
+                mCallbacks.onCrimeDeleted();
              default:
                  return super.onOptionsItemSelected(item);
         }
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
         CrimeLab.get(getActivity()).updateCrime(mCrime);
+        //Log.d("CrimeFragment","crime pause");
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks=(Callbacks)context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks=null;
+    }
+
+
+    private void updateCrimeList() {
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+        mCallbacks.onCrimeUpdated(mCrime);
     }
 
     private void updateDate() {
@@ -400,14 +437,14 @@ public class CrimeFragment extends Fragment {
         return getString(R.string.crime_report_template, mCrime.getTitle(),dateString,solvedString,suspect);
     }
 
-    public void returnResult()
-    {
-        if(!hasModified)
-        {
-            Intent data=new Intent();
-            int index=CrimeLab.get(getActivity()).getCrimes().indexOf(mCrime);
-            data.putExtra(CrimeListFragment.EXTRA_CHANGED_INDEX,index);
-            getActivity().setResult(Activity.RESULT_OK,data);
-        }
-    }
+//    public void returnResult()
+//    {
+//        if(!hasModified)
+//        {
+//            Intent data=new Intent();
+//            int index=CrimeLab.get(getActivity()).getCrimes().indexOf(mCrime);
+//            data.putExtra(CrimeListFragment.EXTRA_CHANGED_INDEX,index);
+//            getActivity().setResult(Activity.RESULT_OK,data);
+//        }
+//    }
 }
